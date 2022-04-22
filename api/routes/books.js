@@ -1,5 +1,7 @@
 const express = require("express");
+const { default: mongoose } = require("mongoose");
 const router = express.Router();
+const Book = require("../models/book");
 
 router.get("/", (req, res, next) => {
     res.json({
@@ -8,9 +10,38 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
-    res.json({
-        message: "Books - POST"
+    const newBook = new Book({
+        _id: mongoose.Types.ObjectId(),
+        title: req.body.title,
+        author: req.body.author
     });
+
+// write to the DB
+    newBook.save()
+        .then(result => {
+            console.log(result);
+            res.status(200).json({
+                message: "Book Saved",
+                book: {
+                    title: result.title,
+                    author: result.author,
+                    id: result._id,
+                    metadata: {
+                        method: req.method,
+                        host: req.hostname
+                    }
+                }
+            })
+        })
+        .catch(err => {
+            console.error(err.message);
+            res.status(500).json({
+                error: {
+                    message: err.message
+                }
+            })
+        });
+
 });
 
 router.get("/:bookId", (req, res, next) => {

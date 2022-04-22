@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const mongoose = require("mongoose");
 const authorRoutes = require("../api/routes/authors");
 const bookRoutes = require("../api/routes/books");
 
@@ -57,5 +58,14 @@ app.use((error, req, res, next) => {
 
 
 
+// connect to mongoDB
+mongoose.connect(process.env.mongoDBURL, (err) => {
+    if(err){
+        console.log("Error: ", err.message);
+    }
+    else{
+        console.log("MongoDB connection was successful");
+    }
+});
 
 module.exports = app;
